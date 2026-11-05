@@ -36,6 +36,12 @@ This is a DSH profile plugin bundle (Host half + Web Client half).
 Requires a DSH build with the Web GUI (`dsh.client.platform: web`) and the
 `conversation.composer.dock` slot.
 
+To install the published copy instead of a checkout, point `install_bundle` at the
+repository: `https://github.com/wzy816/dsh-plugin-deepseek-balance`.
+
+The package ships no icon, so the Plugins panel uses its default artwork for this
+bundle.
+
 ## Price rule
 
 Peak hours are **01:00–04:00 and 06:00–10:00 UTC, Monday through Friday, excluding
@@ -98,5 +104,4 @@ patch also carries it, and a user patch override wins):
 | `client.js` | Client half: registers into `conversation.composer.dock`, renders the line, ticks the countdown, polls the snapshot |
 | `cordis.patch.yml` | Bundle patch inserting the plugin row |
 | `locale/en.json`, `locale/zh.json` | Plugin manager title and description |
-| `icon.svg` | Plugin manager icon |
 | `assets/screenshot.png` | Status-bar screenshot used by this README |
