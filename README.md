@@ -1,107 +1,93 @@
 # dsh-plugin-deepseek-balance
 
-A DSH profile plugin that adds one ambient status line to the composer dock, to the
-right of the context meter:
+English | [中文](#中文)
 
-```
-Total ¥17.62 │ ● Off-peak → Peak in 00:45:53
-```
+A DSH profile plugin: one status line at the right end of the composer dock showing the
+DeepSeek total balance, whether the current hour is peak or off-peak pricing, and a
+countdown to the next price switch.
 
-![Composer status bar showing the DeepSeek balance and the peak/off-peak countdown](assets/screenshot.png)
-
-*The status line sits at the right end of the composer dock, next to the context meter.*
-
-It shows the account's total balance (the sum of granted and topped up) and whether
-the current hour is peak or off-peak pricing, with a live countdown to the next price
-switch. The line uses the same type scale, color, padding and radius as the shipped
-composer stat pills, so it reads as one more reading in that status bar; the granted /
-topped-up split is still in the hover tooltip rather than the line itself.
-
-Hovering the line gives the full picture (next switch in local time, why the current
-hour is off-peak, the peak windows, holiday-data status, the balance fetch time);
-clicking it refreshes immediately.
+![Composer status bar showing the balance and the peak/off-peak countdown](assets/screenshot.png)
 
 ## Install
 
-This is a DSH profile plugin bundle (Host half + Web Client half).
+1. Store the API key in the profile's credential service as `DEEPSEEK_API_KEY`.
+2. In an agent session, run `plugin_manager` with `action: install_bundle` and
+   `target: https://github.com/wzy816/dsh-plugin-deepseek-balance` (a checkout path
+   works too).
 
-1. Store the API key in the profile's credential service under `DEEPSEEK_API_KEY`
-   (`ctx.credentials.resolve` reads it; the process environment is the fallback).
-2. Install the bundle by pointing DSH's plugin manager at this directory — in an
-   agent session, `plugin_manager` with `action: install_bundle` and `target` set to
-   the absolute path of this checkout. Its `cordis.patch.yml` inserts the
-   `dsh-plugin-deepseek-balance` row into the profile.
-3. Open a conversation: the line appears at the right end of the composer status bar.
+## What it does
 
-Requires a DSH build with the Web GUI (`dsh.client.platform: web`) and the
-`conversation.composer.dock` slot.
-
-To install the published copy instead of a checkout, point `install_bundle` at the
-repository: `https://github.com/wzy816/dsh-plugin-deepseek-balance`.
-
-The package ships no icon, so the Plugins panel uses its default artwork for this
-bundle.
-
-## Price rule
-
-Peak hours are **01:00–04:00 and 06:00–10:00 UTC, Monday through Friday, excluding
-Chinese public holidays** (per the DeepSeek pricing page). Every other hour is
-off-peak, including weekends and Chinese public holidays in full.
-
-The plugin evaluates the rule on the Host using UTC instants and Chinese holiday
-dates from [timor.tech](https://timor.tech/api/holiday). Holiday data is cached per
-year. Because a switch can only happen at a window edge or at UTC midnight, the next
-switch instant is exact.
-
-## Where the numbers come from
-
-| Value | Source |
-|---|---|
-| `granted_balance`, `topped_up_balance` | `GET https://api.deepseek.com/user/balance` with the profile's API key |
-| Total shown | `granted_balance + topped_up_balance`, summed in the Client half |
-| Chinese public holidays | `GET https://timor.tech/api/holiday/year/{year}` |
-
-The API key never reaches the browser: the Host half resolves the credential
-reference (`DEEPSEEK_API_KEY` by default) through the profile credential store, with
-the process environment as an ambient fallback, and serves one same-origin JSON
-snapshot on `/_dsh/deepseek-balance`. The browser only polls that route.
+- **Total balance** — granted + topped up, read from
+  `GET https://api.deepseek.com/user/balance` with the profile key. The key stays on
+  the Host: the Client half only polls a same-origin snapshot on `/_dsh/deepseek-balance`.
+- **Peak / off-peak + countdown** — peak is 01:00–04:00 and 06:00–10:00 UTC, Monday to
+  Friday, excluding Chinese public holidays ([timor.tech](https://timor.tech/api/holiday)).
+  Everything else is off-peak. Holidays are cached per year, and the next switch is exact.
+- **Hover** for the next switch time, the reason (holiday / weekend / window), the peak
+  windows and holiday-data status; **click** to refresh immediately.
 
 ## Configuration
-
-Edit the row's `config` through the profile's `cordis.patch.yml` (the plugin's own
-patch also carries it, and a user patch override wins):
 
 ```yaml
 - id: dsh-plugin-deepseek-balance
   name: dsh-plugin-deepseek-balance
   config:
-    apiKeyRef: DEEPSEEK_API_KEY          # credential reference (env-var name)
-    apiBase: https://api.deepseek.com    # balance endpoint base
-    holidayApiBase: https://timor.tech/api/holiday
-    balanceTtlSeconds: 60                # balance cache; also the manual-refresh cadence
-    holidayTtlSeconds: 21600             # 6h holiday cache
-    requestTimeoutMs: 15000
+    apiKeyRef: DEEPSEEK_API_KEY   # credential reference
+    balanceTtlSeconds: 60         # balance cache and refresh cadence
+    holidayTtlSeconds: 21600      # 6h holiday cache
 ```
 
-## Behaviour and limits
+`apiBase`, `holidayApiBase` and `requestTimeoutMs` are configurable too.
 
-- The status line renders only while a conversation is open (the
-  `conversation.composer.dock` slot is session-scoped).
-- The dock is a plain block in the host, so the Client half turns it into one
-  wrapping, right-aligned flex strip and gives this entry `order: 1`, which places
-  it after the context meter at the right edge of the status bar.
-- If holiday data for a required year is not published yet, the hour is judged by
-  UTC weekday only, and the tooltip says so.
-- A missing or rejected API key renders `Balance no API key` / `Balance unavailable`
-  and keeps the price-period half working; the failure reason is in the tooltip.
-- The snapshot route allows only loopback / this machine's own Host headers.
+## Notes
 
-## Files
+- Renders only while a conversation is open (the composer dock slot is session-scoped).
+- The package ships no icon, so the Plugins panel uses its default artwork.
+- The snapshot route accepts loopback / this machine's own Host headers only.
 
-| File | Role |
-|---|---|
-| `index.js` | Host half: credential resolution, balance and holiday fetches, price-period evaluation, `/_dsh/deepseek-balance` route |
-| `client.js` | Client half: registers into `conversation.composer.dock`, renders the line, ticks the countdown, polls the snapshot |
-| `cordis.patch.yml` | Bundle patch inserting the plugin row |
-| `locale/en.json`, `locale/zh.json` | Plugin manager title and description |
-| `assets/screenshot.png` | Status-bar screenshot used by this README |
+---
+
+# 中文
+
+[English](#dsh-plugin-deepseek-balance) | 中文
+
+一个 DSH 配置档插件：在输入框状态栏右侧显示一行信息，包含 DeepSeek 总余额、当前是峰时
+还是谷时，以及距离下一次价格切换的倒计时。
+
+![输入框状态栏中的余额与峰谷倒计时](assets/screenshot.png)
+
+## 安装
+
+1. 在配置档的凭据服务中存入 API Key，引用名为 `DEEPSEEK_API_KEY`。
+2. 在 agent 会话里调用 `plugin_manager`，`action: install_bundle`，
+   `target: https://github.com/wzy816/dsh-plugin-deepseek-balance`（也可以填本地目录）。
+
+## 功能
+
+- **总余额** —— 赠送余额 + 充值余额，用配置档内的 Key 读取
+  `GET https://api.deepseek.com/user/balance`。Key 只留在 Host 侧，浏览器只轮询同源快照
+  `/_dsh/deepseek-balance`。
+- **峰时 / 谷时 + 倒计时** —— 峰时为 UTC 01:00–04:00 与 06:00–10:00，周一至周五，且排除
+  中国法定节假日（数据来自 [timor.tech](https://timor.tech/api/holiday)）；其余时间为谷时。
+  节假日数据按年缓存，下次切换时刻精确到窗口边界。
+- **悬停**查看下次切换时间、当前峰/谷原因（节假日 / 周末 / 窗口外）、峰时时段和节假日数据
+  状态；**点击**立即刷新。
+
+## 配置
+
+```yaml
+- id: dsh-plugin-deepseek-balance
+  name: dsh-plugin-deepseek-balance
+  config:
+    apiKeyRef: DEEPSEEK_API_KEY   # 凭据引用名
+    balanceTtlSeconds: 60         # 余额缓存与刷新间隔
+    holidayTtlSeconds: 21600      # 节假日缓存（6 小时）
+```
+
+`apiBase`、`holidayApiBase`、`requestTimeoutMs` 也可配置。
+
+## 说明
+
+- 仅在打开会话时显示（该插槽是会话作用域）。
+- 包内不含图标，插件面板使用默认图案。
+- 快照路由只接受回环地址或本机 Host 头。
