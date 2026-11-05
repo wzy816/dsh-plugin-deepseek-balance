@@ -1,0 +1,7 @@
+- insert:
+    - id: dsh-plugin-deepseek-balance
+      name: dsh-plugin-deepseek-balance
+      config:
+        apiKeyRef: DEEPSEEK_API_KEY
+        balanceTtlSeconds: 60
+        holidayTtlSeconds: 21600

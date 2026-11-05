@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "DeepSeek Balance & Price Period",
+    "description": "Adds a status line under the composer with granted and topped-up balance, whether the current hour is peak or off-peak pricing, and a countdown to the next price switch."
+  }
+}
