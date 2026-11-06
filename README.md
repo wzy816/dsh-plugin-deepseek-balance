@@ -42,7 +42,8 @@ countdown to the next price switch.
 ## Notes
 
 - Renders only while a conversation is open (the composer dock slot is session-scoped).
-- The package ships no icon, so the Plugins panel uses its default artwork.
+- The package ships an original SVG icon (`icon.svg`, exported as `./icon`): a yuan coin inside a
+  two-tone pricing ring, warm for peak hours and cool for off-peak hours.
 - The snapshot route accepts loopback / this machine's own Host headers only.
 
 ---
@@ -89,5 +90,6 @@ countdown to the next price switch.
 ## 说明
 
 - 仅在打开会话时显示（该插槽是会话作用域）。
-- 包内不含图标，插件面板使用默认图案。
+- 包内包含自绘 SVG 图标（`icon.svg`，导出为 `./icon`）：双色价格环中的 ¥ 硬币，暖色表示峰时、
+  冷色表示谷时。
 - 快照路由只接受回环地址或本机 Host 头。

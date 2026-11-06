@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DeepSeek balance and price period">
+  <defs>
+    <linearGradient id="dbg-bg" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a74ff"/>
+      <stop offset="1" stop-color="#2c3fc4"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#dbg-bg)"/>
+  <!-- Pricing ring: warm half for peak hours, cool half for off-peak hours. -->
+  <path d="M27.61 9.42A23 23 0 0 0 27.61 54.58" fill="none" stroke="#f7c65a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M36.39 9.42A23 23 0 0 1 36.39 54.58" fill="none" stroke="#77dcc8" stroke-width="6" stroke-linecap="round"/>
+  <!-- Coin with a yuan sign. -->
+  <circle cx="32" cy="32" r="14.5" fill="#f7f9ff"/>
+  <g fill="none" stroke="#22307a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24.8 20.2 32 30.4"/>
+    <path d="M39.2 20.2 32 30.4"/>
+    <path d="M32 30.4v14.4"/>
+    <path d="M25.6 33.6h12.8"/>
+    <path d="M25.6 39h12.8"/>
+  </g>
+</svg>
