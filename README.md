@@ -48,7 +48,7 @@ countdown to the next price switch.
 
 ---
 
-# 中文
+## 中文
 
 [English](#dsh-plugin-deepseek-balance) | 中文
 
